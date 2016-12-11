@@ -1,11 +1,11 @@
-FROM ubuntu:15.04
+FROM ubuntu:15.10
 MAINTAINER Adrian Brink <adrian@brink-holdings.com>
 
 ENV USER root
 
-ENV SWIFT_BRANCH swift-3.0.0-release
-ENV SWIFT_VERSION swift-3.0.0-RELEASE
-ENV SWIFT_PLATFORM ubuntu15.04
+ENV SWIFT_BRANCH swift-3.0-release
+ENV SWIFT_VERSION swift-3.0-RELEASE
+ENV SWIFT_PLATFORM ubuntu15.10
 
 RUN apt-get update && \
     apt-get install -y build-essential wget clang-3.6 curl libedit-dev python2.7 python2.7-dev libicu-dev rsync libxml2 git libcurl4-openssl-dev && \
