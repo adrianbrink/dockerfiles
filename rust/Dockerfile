@@ -1,0 +1,30 @@
+FROM debian:jessie
+MAINTAINER Adrian Brink <adrian@brink-holdings.com>
+
+ENV USER root
+
+WORKDIR /root
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    build-essential ca-certificates curl && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl https://sh.rustup.rs -sSf | \
+    sh -s -- --default-toolchain nightly -y
+
+ENV PATH=/root/.cargo/bin:$PATH \
+    SSL_VERSION=1.0.2j
+
+RUN curl https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz -O && \
+    tar -xzf openssl-$SSL_VERSION.tar.gz && \
+    cd openssl-$SSL_VERSION && ./config && make depend && make install && \
+    cd .. && rm -rf openssl-$SSL_VERSION*
+
+ENV OPENSSL_LIB_DIR=/usr/local/ssl/lib \
+    OPENSSL_INCLUDE_DIR=/usr/local/ssl/include \
+    OPENSSL_STATIC=1
+
+RUN mkdir /source
+COPY . /source
+WORKDIR /source
+CMD ["/bin/bash"]
