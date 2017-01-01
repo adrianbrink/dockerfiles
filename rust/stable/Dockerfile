@@ -1,23 +1,26 @@
 FROM debian:jessie
-MAINTAINER Adrian Brink <adrian@brink-holdings.com>
+MAINTAINER Adrian Brink "adrian@brink-holdings.com"
 
-ENV USER root
+ENV DEBIAN_FRONTEND=noninteractive
 
-WORKDIR /root
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y \
-    build-essential ca-certificates curl
+    apt-get install \
+       ca-certificates \
+       curl \
+       gcc \
+       libc6-dev \
+       -qqy \
+       --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN curl https://sh.rustup.rs -sSf | \
-    sh -s -- --default-toolchain stable -y
+ENV RUST_ARCHIVE=rust-1.14.0-x86_64-unknown-linux-gnu.tar.gz
+ENV RUST_DOWNLOAD_URL=https://static.rust-lang.org/dist/$RUST_ARCHIVE
 
-RUN apt-get remove --purge -y curl && \
-    apt-get autoclean && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN mkdir /rust
+WORKDIR /rust
 
-ENV PATH=/root/.cargo/bin:$PATH
-
-VOLUME ["/source"]
-WORKDIR /source
-CMD ["/bin/bash"]
+RUN curl -fsOSL $RUST_DOWNLOAD_URL \
+    && curl -s $RUST_DOWNLOAD_URL.sha256 | sha256sum -c - \
+    && tar -C /rust -xzf $RUST_ARCHIVE --strip-components=1 \
+    && rm $RUST_ARCHIVE \
+    && ./install.sh
